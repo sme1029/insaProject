@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.greedy.insaProject.mapper.InsaMapper">
+
+	<!-- 인사DTO부분 -->
+	<resultMap id="insaResultMap" type="com.greedy.insaProject.dto.InsaDTO">
+		<id property="sabun" column="SABUN"/>
+		<result property="joinDay" column="JOIN_DAY"/>
+		<result property="retireDay" column="RETIRE_DAY"/>
+		<result property="putYn" column="PUT_YN"/>
+		<result property="name" column="NAME"/>
+		<result property="regNo" column="REG_NO"/>
+		<result property="engName" column="ENG_NAME"/>
+		<result property="phone" column="PHONE"/>
+		<result property="hp" column="HP"/>
+		<result property="carrier" column="CARRIER"/>
+		<result property="posGbnCode" column="POS_GBN_CODE"/>
+		<result property="cmpRegNo" column="CMP_REG_NO"/>
+		<result property="cmpRegImage" column="CMP_REG_IMAGE"/>
+		<result property="sex" column="SEX"/>
+		<result property="years" column="YEARS"/>
+		<result property="email" column="EMAIL"/>
+		<result property="email1" column="EMAIL1"/>
+		<result property="email2" column="EMAIL2"/>
+		<result property="zip" column="ZIP"/>
+		<result property="addr1" column="ADDR1"/>
+		<result property="addr2" column="ADDR2"/>
+		<result property="deptCode" column="DEPT_CODE"/>
+		<result property="joinGbnCode" column="JOIN_GBN_CODE"/>
+		<result property="id" column="ID"/>
+		<result property="pwd" column="PWD"/>
+		<result property="salary" column="SALARY"/>
+		<result property="kosaRegYn" column="KOSA_REG_YN"/>
+		<result property="kosaClassCode" column="KOSA_CLASS_CODE"/>
+		<result property="milYn" column="MIL_YN"/>
+		<result property="milType" column="MIL_TYPE"/>
+		<result property="milLevel" column="MIL_LEVEL"/>
+		<result property="milStartdate" column="MIL_STARTDATE"/>
+		<result property="milEnddate" column="MIL_ENDDATE"/>
+		<result property="joinType" column="JOIN_TYPE"/>
+		<result property="gartLevel" column="GART_LEVEL"/>
+		<result property="selfIntro" column="SELF_INTRO"/>
+		<result property="crmName" column="CRM_NAME"/>
+		<result property="profileImage" column="PROFILE_IMAGE"/>
+		<result property="carrierImage" column="CARRIER_IMAGE"/>	
+	</resultMap>
+	
+	<!-- 공통DTO부분 -->
+	<resultMap id="insaComResultMap" type="com.greedy.insaProject.dto.InsaComDTO">
+		<id property="gubun" column="GUBUN"/>
+		<id property="code" column="CODE"/>
+		<result property="name" column="NAME"/>
+		<result property="note" column="NOTE"/>	
+	</resultMap>
+	
+	<!-- /////////////////////////////////////////////////////////////////////////////// -->
+	
+	<!-- 공통코드 추가 과제 셋팅 -->
+    <select id="commonSet" resultMap="insaComResultMap">
+     	SELECT
+     	  		GUBUN 
+        	  , CODE
+        	  , NAME
+        	  , NOTE
+          FROM 
+        		TBL_INSA_COM
+         WHERE  1=1
+    	 ORDER BY GUBUN
+    </select>
+    
+    <!-- 공통코드 저장 -->
+    <insert id="commonSave">
+   	    INSERT
+   	      INTO TBL_INSA_COM
+   	    	 (
+		  	GUBUN 
+      	  , CODE
+       	  , NAME
+       	  , NOTE
+			) 
+			VALUES
+			(
+			  #{ gubun }
+		    , #{ code }
+		    , #{ name }
+		    , #{ note }
+			)
+    </insert>
+	
+	<!-- /////////////////////////////////////////////////////////////////////////////// -->
+	
+	
+	<!-- 등록 셋팅 -->
+    <select id="selectCodeList" resultMap="insaComResultMap">
+     	SELECT
+     		   GUBUN,
+     		   CODE,
+     		   NAME
+     	  FROM 
+     		   TBL_INSA_COM
+    </select>
+    
+    <!-- <select id="selectCodeList" resultMap="insaComResultMap">
+     	SELECT
+	    	CODE AS value,
+	    	NAME as label
+	  	  FROM INSA_COM
+		  WHERE GUBUN = #{param}
+		 ORDER BY CODE ASC
+    </select> -->
+  
+    <!-- 사번 조회 등록 -->
+    <select id="selectSabun" resultMap="insaResultMap">		
+		SELECT 
+		   	   NVL(MAX(SABUN),0)+1 AS SABUN 
+		  FROM
+		       TBL_INSA
+    </select>
+    
+    <!-- 사번 조회 수정 -->
+	<select id="selectUser" resultMap="insaResultMap">
+	
+		SELECT
+			   SABUN
+			 , TO_CHAR(JOIN_DAY,'YYYY-MM-DD') AS JOIN_DAY
+			 , TO_CHAR(RETIRE_DAY,'YYYY-MM-DD') AS RETIRE_DAY
+			 , PUT_YN
+			 , NAME
+			 , REG_NO
+			 , REG_NO AS REG
+			 , ENG_NAME
+			 , PHONE
+			 , HP
+			 , CARRIER
+			 , POS_GBN_CODE
+			 , CMP_REG_NO
+			 , CMP_REG_IMAGE
+			 , SEX
+			 , YEARS
+			 , EMAIL
+			 , SUBSTR(EMAIL,0,INSTR(EMAIL,'@')-1) AS EMAIL1
+    		 , SUBSTR(EMAIL,INSTR(EMAIL,'@')) AS EMAIL2
+			 , ZIP
+			 , ADDR1
+			 , ADDR2
+			 , DEPT_CODE
+			 , JOIN_GBN_CODE
+			 , ID
+			 , PWD
+			 , SALARY
+			 , KOSA_REG_YN
+			 , KOSA_CLASS_CODE
+			 , MIL_YN
+			 , MIL_TYPE
+			 , MIL_LEVEL
+			 , MIL_STARTDATE
+			 , MIL_ENDDATE
+			 , JOIN_TYPE
+			 , GART_LEVEL
+			 , SELF_INTRO
+			 , CRM_NAME
+			 , PROFILE_IMAGE
+			 , CARRIER_IMAGE
+		  FROM TBL_INSA
+		 WHERE SABUN = #{searchsabun}
+	</select>
+    
+    <!-- 등록, 사용안함, 업설트로 대체 -->
+	<!-- <insert id="insertInfo">
+		INSERT
+		  INTO TBL_INSA
+		(
+		  SABUN
+		, JOIN_DAY
+		, RETIRE_DAY
+		, NAME
+		, PUT_YN		
+		, REG_NO
+		, ENG_NAME
+		, PHONE
+		, HP
+		, CARRIER
+		, POS_GBN_CODE
+		, CMP_REG_NO
+		, CMP_REG_IMAGE
+		, SEX
+		, YEARS
+		, EMAIL
+		, ZIP
+		, ADDR1
+		, ADDR2
+		, DEPT_CODE
+		, JOIN_GBN_CODE
+		, ID
+		, PWD
+		, SALARY
+		, KOSA_REG_YN
+		, KOSA_CLASS_CODE
+		, MIL_YN
+		, MIL_TYPE
+		, MIL_LEVEL
+		, MIL_STARTDATE
+		, MIL_ENDDATE
+		, JOIN_TYPE
+		, GART_LEVEL
+		, SELF_INTRO
+		, CRM_NAME
+		, PROFILE_IMAGE
+		, CARRIER_IMAGE			 
+		) 
+		VALUES
+		(
+		  #{ sabun }
+	    , #{ joinDay }
+		, #{ retireDay } 
+		, #{ name }
+		, #{ putYn }		
+		, #{ regNo }
+		, #{ engName }
+		, #{ phone }
+		, #{ hp }
+		, #{ carrier }
+		, #{ posGbnCode }
+		, #{ cmpRegNo }
+		, #{ cmpRegImage }
+		, #{ sex }
+		, #{ years }
+		, #{ email }
+		, #{ zip }
+		, #{ addr1 }
+		, #{ addr2 }
+		, #{ deptCode }
+		, #{ joinGbnCode }
+		, #{ id }
+		, #{ pwd }
+		, #{ salary }
+		, #{ kosaRegYn }
+		, #{ kosaClassCode }
+		, #{ milYn }
+		, #{ milType }
+		, #{ milLevel }
+		, #{ milStartdate }
+		, #{ milEnddate }
+		, #{ joinType }
+		, #{ gartLevel }
+		, #{ selfIntro }
+		, #{ crmName }
+		, #{ profileImage }
+		, #{ carrierImage }		 
+		)
+	</insert> -->
+	
+	<!-- 등록 + 저장 후 수정 -->
+	<insert id="updateInfo">
+		MERGE 
+		 INTO TBL_INSA
+		USING DUAL
+		   ON (SABUN = #{ sabun })
+		 WHEN MATCHED THEN
+		     UPDATE
+		        SET JOIN_DAY = #{ joinDay }
+		            , RETIRE_DAY = #{ retireDay }
+		     		, NAME = #{ name }
+			 		, PUT_YN = #{ putYn }		
+			 		, REG_NO = #{ reg } 
+					, ENG_NAME = #{ engName }
+			 		, PHONE = #{ phone }
+					, HP = #{ hp }
+			 		, CARRIER = #{ carrier }
+			 		, POS_GBN_CODE = #{ posGbnCode }
+			 		, CMP_REG_NO = #{ cmpRegNo }
+				 	, CMP_REG_IMAGE = #{ cmpRegImage }
+				    , SEX = #{ sex }
+			 	 	, YEARS = #{ years }
+				 	, EMAIL = #{ email }
+				 	, ZIP = #{ zip }
+				 	, ADDR1 = #{ addr1 }
+				 	, ADDR2 = #{ addr2 }
+				 	, DEPT_CODE = #{ deptCode }
+				 	, JOIN_GBN_CODE = #{ joinGbnCode }
+				 	, ID = #{ id }
+				 	, PWD = #{ pwd }
+				 	, SALARY = REPLACE(#{salary},',','')
+				 	, KOSA_REG_YN = #{ kosaRegYn }
+				 	, KOSA_CLASS_CODE = #{ kosaClassCode }
+				 	, MIL_YN = #{ milYn }
+				 	, MIL_TYPE = #{ milType }
+				 	, MIL_LEVEL = #{ milLevel }
+				 	, MIL_STARTDATE = #{ milStartdate }
+				 	, MIL_ENDDATE = #{ milEnddate }
+				 	, JOIN_TYPE = #{ joinType }
+				 	, GART_LEVEL = #{ gartLevel }
+				 	, SELF_INTRO = #{ selfIntro }
+				 	, CRM_NAME = #{ crmName }
+				 	, PROFILE_IMAGE = #{ profileImage }
+				 	, CARRIER_IMAGE = #{ carrierImage }
+			   WHEN NOT MATCHED THEN
+			   	    INSERT
+			   	    	 (
+					  SABUN
+					, JOIN_DAY
+					, RETIRE_DAY
+					, NAME
+					, PUT_YN		
+					, REG_NO
+					, ENG_NAME
+					, PHONE
+					, HP
+					, CARRIER
+					, POS_GBN_CODE
+					, CMP_REG_NO
+					, CMP_REG_IMAGE
+					, SEX
+					, YEARS
+					, EMAIL
+					, ZIP
+					, ADDR1
+					, ADDR2
+					, DEPT_CODE
+					, JOIN_GBN_CODE
+					, ID
+					, PWD
+					, SALARY
+					, KOSA_REG_YN
+					, KOSA_CLASS_CODE
+					, MIL_YN
+					, MIL_TYPE
+					, MIL_LEVEL
+					, MIL_STARTDATE
+					, MIL_ENDDATE
+					, JOIN_TYPE
+					, GART_LEVEL
+					, SELF_INTRO
+					, CRM_NAME
+					, PROFILE_IMAGE
+					, CARRIER_IMAGE			
+					) 
+					VALUES
+					(
+					  #{ sabun }
+				    , #{ joinDay }
+				    , #{ retireDay }
+					, #{ name }
+					, #{ putYn }		
+					, #{ reg }
+					, #{ engName }
+					, #{ phone }
+					, #{ hp }
+					, #{ carrier }
+					, #{ posGbnCode }
+					, #{ cmpRegNo }
+					, #{ cmpRegImage }
+					, #{ sex }
+					, #{ years }
+					, #{ email }
+					, #{ zip }
+					, #{ addr1 }
+					, #{ addr2 }
+					, #{ deptCode }
+					, #{ joinGbnCode }
+					, #{ id }
+					, #{ pwd }
+					, REPLACE(#{salary},',','')
+					, #{ kosaRegYn }
+					, #{ kosaClassCode }
+					, #{ milYn }
+					, #{ milType }
+					, #{ milLevel }
+					, #{ milStartdate }
+					, #{ milEnddate }
+					, #{ joinType }
+					, #{ gartLevel }
+					, #{ selfIntro }
+					, #{ crmName }
+					, #{ profileImage }
+					, #{ carrierImage }		 
+					)	 	 
+	</insert>
+	
+	<!-- 조회 셋팅 -->
+    <select id="selectParamSearch" resultMap="insaResultMap">
+     	SELECT * FROM
+     	(SELECT 
+		    A.SABUN,
+		    A.NAME,
+		    NVL(A.REG_NO, ' ') AS REG_NO,
+		    A.HP,
+		    NVL((SELECT B.NAME FROM TBL_INSA_COM B WHERE B.GUBUN='A03' AND A.POS_GBN_CODE = B.CODE), ' ') AS POS_GBN_CODE,
+		    TO_CHAR(A.JOIN_DAY, 'YYYY-MM-DD') AS JOIN_DAY,
+		    NVL(TO_CHAR(A.RETIRE_DAY, 'YYYY-MM-DD'), ' ') AS RETIRE_DAY,
+		    NVL(A.PUT_YN, ' ') AS PUT_YN,
+		    NVL(A.SALARY, '0') AS SALARY,
+		    (SELECT B.NAME FROM TBL_INSA_COM B WHERE B.GUBUN='A06' AND A.JOIN_TYPE = B.CODE) AS JOINGUBUN,
+		    (SELECT B.NAME FROM TBL_INSA_COM B WHERE B.GUBUN='A05' AND A.JOIN_GBN_CODE = B.CODE) AS JGBN,
+		    ROWNUM RN
+		 FROM TBL_INSA A
+		 WHERE 1=1
+		<if test="sabun != '' and sabun != null">
+		    AND A.SABUN = #{ sabun }
+		</if>
+	    <if test="name != '' and name != null">	 		 
+		    AND A.NAME LIKE #{ name } || '%'
+	    </if>
+	    <if test="joinType != '' and joinType != null">	
+			AND A.JOIN_TYPE = #{ joinType }
+			</if>
+		<if test="putYn != '' and putYn != null">	
+		    AND A.PUT_YN = #{ putYn }
+		    </if>
+	    <if test="posGbnCode != '' and posGbnCode != null">	
+		    AND A.POS_GBN_CODE = #{ posGbnCode }
+		    </if>
+	     <if test="joinDay != '' and joinDay != null">	
+		    AND TO_CHAR(A.JOIN_DAY, 'YYYY-MM-DD') = #{ joinDay }
+		    </if>
+	    <if test="retireDay != '' and retireDay != null">	
+		    AND TO_CHAR(A.RETIRE_DAY,'YYYY-MM-DD') = #{ retireDay }
+		    </if>
+	    <if test="joinGbnCode != '' and joinGbnCode != null">	
+		    AND A.JOIN_GBN_CODE = #{ joinGbnCode }
+		    </if>
+		     ORDER BY SABUN
+		    )
+		    
+		    <![CDATA[WHERE RN >= #{startrow} AND RN <= #{endrow}]]>
+    </select>
+   
+    <!-- total -->
+    <select id="totalPage" resultType="int">
+	        SELECT 
+	        	count(*) AS TOTAL
+	        FROM 
+	        TBL_INSA A
+	       	WHERE 1=1
+		<if test="sabun != '' and sabun != null">
+		    AND A.SABUN = #{ sabun }
+		</if>
+	    <if test="name != '' and name != null">	 		 
+		    AND A.NAME LIKE #{ name } || '%'
+	    </if>
+	    <if test="joinType != '' and joinType != null">	
+			AND A.JOIN_TYPE = #{ joinType }
+			</if>
+		<if test="putYn != '' and putYn != null">	
+		    AND A.PUT_YN = #{ putYn }
+		    </if>
+	    <if test="posGbnCode != '' and posGbnCode != null">	
+		    AND A.POS_GBN_CODE = #{ posGbnCode }
+		    </if>
+	     <if test="joinDay != '' and joinDay != null">	
+		    AND TO_CHAR(A.JOIN_DAY, 'YYYY-MM-DD') = #{ joinDay }
+		    </if>
+	    <if test="retireDay != '' and retireDay != null">	
+		    AND TO_CHAR(A.RETIRE_DAY,'YYYY-MM-DD') = #{ retireDay }
+		    </if>
+	    <if test="joinGbnCode != '' and joinGbnCode != null">	
+		    AND A.JOIN_GBN_CODE = #{ joinGbnCode }
+		    </if>
+	</select>
+	
+    <!-- 삭제 -->
+    <delete id="deleteList">
+		DELETE
+		  FROM TBL_INSA
+		 WHERE SABUN = #{ sabun }
+	
+	</delete>
+  
+</mapper>
